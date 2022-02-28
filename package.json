@@ -1,0 +1,29 @@
+{
+  "name": "optidrive_expo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MayKashani/OptiDrive_expo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MayKashani/OptiDrive_expo/issues"
+  },
+  "homepage": "https://github.com/MayKashani/OptiDrive_expo#readme",
+  "dependencies": {
+    "@googlemaps/google-maps-services-js": "github:googlemaps/google-maps-services-js",
+    "axios": "^0.25.0",
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "firebase-admin": "^10.0.2"
+  }
+}

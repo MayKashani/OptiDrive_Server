@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "optidrive-expo",
+  "private_key_id": "d7d845092d514c9b72a0315f74c7f3c48208e9d8",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQD3+BHEbhoVMlJt\n3onvAyFdRfUezRg/V5Gtr3sq7RMyy/GBmJibRqLp50n9foK2z6DugPRsOIHqsxgR\nprJ2mj4uyldoo2dA+EEzf5o4UZoH4zgFpMwE0BtmVhmnzBSl858BFtOKdr90weOI\nfk2w71tzPkKOZvgF6wsEsuxzZS+GvzbH8wnl7m0LC54cS4GWoPqSyjyJ0rgNRwax\neu1fqMhUYnjSmtI9DEDBeNcnUAh6jkfymuKVw4SnDFuZSCKFbvv/1Fji7OqopDg+\ng7hSAbtXdiK8INb7e7OKYF74KudbnQ0tnAZBOWZBjOTAkUznAX0hIqwito+3EljG\n/JkRRpX9AgMBAAECgf8Spm7RzM7ltC6Yi8Yp9rpqZ2BE3bt1/epXeBR+7fyAii50\nXe4tfZU0cEWq5ImjfWXN5FZE/4XUvnoVOVqNT6a4GMys1qDQvLyMhkvR/INFWpLB\npZKlCuDye90672gyExxypAsgFK3qu3YmrvLR6VV2opCbz11ksrVMZS07KQgVAzUH\nKmE7G5CvF7cJhMBZRUzCn8spk1NwaD4/oWUg3LHM/c9MXWz5tZZOFNQokNifguMz\nSoOaYhp6/OowFLQz/eFksd03e9v2uySmS9FS3P5W7qmpHSkjunB8HdYojPIxZBVB\nbRj0ghoqn1oCPrvvJn4h70ixqV6huj+jpUMKkakCgYEA/ZJjkI5zzzGCkp1g1qei\nptQF0Sj0K1Ql81EKaUnPGjQ7iRpZZuRSTjE6RaGzUp9n3FvZ0F8PrUmuhKmztKAE\nGE6I8tHbolZqH7spQXqzkKE5lQ/xO5Pm+ba2t8t7J89dwfi41T7Epo0IyYAN6yC6\nDyJM8CyYrwhZ6D0R4H9vydUCgYEA+lfyFT5TF6F8iBA/9NWdnPoG4Duu4oH4QfuN\nM5p5wCPxb9lFA+bR0O1RsaA3f5hSUUk+r32LjsgCNSegcjdY2VfkqDquNbWdnfpq\n1uWIvAKcA8nGwtTqBho2ierd9SgRQYR63ml7CIwFM++WWzXyc/CN7M2jifcZ0XZk\nHCbTx4kCgYEAqvQ+2/6uZUnj1iT0XMO4DPF02obZ1zxsOZaxhjqUvf3pBY4WKCBW\nvRDDUJ6r31BJHW9vceQlFZdPaXFgDq6zFBAelFaX1OKdubbdIaAv35pS0ARnhts4\nJbLhjRhKd5R+iX++XUZsHj2HZxJGT/dIeVuOs33dkmP2+XPy0YAZReECgYEAkgPT\ntiJI8sKE0ROxSguCR7npYsZM5d5qv4mKPSv/kVslilhOkc0CWfrhqFnLpQdiE/lF\nr7PpP1lXOEupoJS5pONIAftf+wG4MhmKUVdF3msjNm5tGNx4tyB46Q5tcX1yOyWb\nSLh7Q2vv6O/4YbDgflEzZog2t9TBYVPNZkIbSgkCgYEA0Ajr4pbmclMuV7RcoqNW\nYE0M5nOG/tRYVyLlsQn8+1h922XsH3PfiIzv2vxCYc4h40bWmaJFUjgI3krIy2Sa\nAyCW5YJKMJD/PZzepOzob7SGm9oXO4vBxXuY3Jc9FixFL+kBawqp6+flqDvTYrQy\n4+gVGnCmtEHuJmfLSZcNk58=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-bpz3l@optidrive-expo.iam.gserviceaccount.com",
+  "client_id": "101501731840576006739",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-bpz3l%40optidrive-expo.iam.gserviceaccount.com"
+}
