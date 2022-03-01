@@ -41,15 +41,14 @@ app.post("/students",jsonParser,(req,res)=>{
 
 //GET students according to userID in FIREBASE
 app.get("/students",(req,res)=>{
-  alert("server is up")
-  // ref.child("users").child(req.query.uId).child("students").once("value",snapshot=>{
-  //     if(snapshot.val() != null){
-  //       res.status(200).send(snapshot.val())
-  //       console.log(snapshot.val())
-  //     }
-  //     else
-  //       res.status(404).send("no students for you")
-  // })
+  ref.child("users").child(req.query.uId).child("students").once("value",snapshot=>{
+      if(snapshot.val() != null){
+        res.status(200).send(snapshot.val())
+        console.log(snapshot.val())
+      }
+      else
+        res.status(404).send("no students for you")
+  })
 })
 
 app.post('/routes',jsonParser,(req,res)=>{
