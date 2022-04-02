@@ -12,21 +12,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MayKashani/OptiDrive_expo.git"
+    "url": "git+https://github.com/MayKashani/serverDeployment.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/MayKashani/OptiDrive_expo/issues"
+    "url": "https://github.com/MayKashani/serverDeployment/issues"
   },
-  "homepage": "https://github.com/MayKashani/OptiDrive_expo#readme",
+  "homepage": "https://github.com/MayKashani/serverDeployment#readme",
   "dependencies": {
     "@googlemaps/google-maps-services-js": "github:googlemaps/google-maps-services-js",
     "axios": "^0.25.0",
     "body-parser": "^1.19.1",
     "cors": "^2.8.5",
     "express": "^4.17.2",
-    "firebase-admin": "^10.0.2"
+    "firebase-admin": "^10.0.2",
+    "node-geometry-library": "^1.2.6"
   }
 }

@@ -1,3 +1,4 @@
+var calcRoute = require('./calcRoute')
 const express = require("express");
 const cors = require("cors")
 const bodyParser = require ("body-parser")
@@ -57,6 +58,7 @@ app.post('/routes',jsonParser,(req,res)=>{
 
 //GET ALL Lessons from firebase according to userID
 app.get("/lessons",(req,res)=>{
+  console.log(req)
   ref.child("users").child(req.query.uId).child("lessons").once("value",snapshot=>{
       if(snapshot.val() != null)
         res.status(200).send(snapshot.val())
@@ -83,6 +85,15 @@ app.get("/lessons/today",(req,res)=>{
   })
 })
 
+
+app.post("/route",jsonParser,(req,res)=>{
+  let origin=req.body.origin
+  let destination=req.body.destination
+  let requestedTypes=req.body.requestedTypes
+  calcRoute.initialRoute(origin,destination,requestedTypes)
+    .then(resRoute=>res.status(200).send(resRoute))
+
+})
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
