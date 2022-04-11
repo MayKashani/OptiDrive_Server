@@ -52,6 +52,13 @@ app.get("/students",(req,res)=>{
   })
 })
 
+
+app.post("/stops",jsonParser,(req,res)=>{
+  console.log(req.query)
+  ref.child("stops").child(req.query.type).push(req.body)
+  res.send(req.body)
+});
+
 app.post('/routes',jsonParser,(req,res)=>{
   console.log(req.body)
 })
