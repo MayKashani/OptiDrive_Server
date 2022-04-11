@@ -60,7 +60,7 @@ app.post("/stops",jsonParser,(req,res)=>{
 });
 
 
-app.get("/stops",(req,res)=>{
+app.get("/getStops",(req,res)=>{
   ref.child("stops").child("parking").once("value",snapshot=>{
       if(snapshot.val() != null)
         res.status(200).send(snapshot.val())
