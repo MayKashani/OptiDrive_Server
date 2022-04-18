@@ -61,11 +61,9 @@ app.post("/stops",jsonParser,(req,res)=>{
 
 
 app.get("/getStops",(req,res)=>{
-  ref.child("stops").once("value",snapshot=>{
-      if(snapshot.val() != null){
-        console.log(snapshot.val())
+  ref.child("stops").child("parking").once("value",snapshot=>{
+      if(snapshot.val() != null)
         res.status(200).send(snapshot.val())
-      }
       else
         res.status(404).send("no stops")
   })
