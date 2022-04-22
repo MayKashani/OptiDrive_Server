@@ -49,7 +49,7 @@ function resetAll() {
 
 function validateInitialRoute(result){
     let duration = result.routes[0].legs[0].duration.value/60
-    if ( duration > 25){
+    if ( duration > 40){
         console.log('Route is too long! Choose another one.')
         return false;
     }
@@ -82,7 +82,7 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes) {
 			isvalid = validateInitialRoute(res)
 			waypoints = PolyUtil.decode(res.routes[0].overview_polyline.points)
 			if (!isvalid)
-				return;
+				return new Error('Invalid route request');
 		}	
 	})
 	.then(async function () {

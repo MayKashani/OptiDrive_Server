@@ -109,7 +109,9 @@ app.post("/route",jsonParser,(req,res)=>{
   let destination=req.body.destination
   let requestedTypes=req.body.requestedTypes
   calcRoute.initialRoute(origin,destination,requestedTypes)
-    .then(resRoute=>res.status(200).send(resRoute))
+    .then(resRoute=>{
+      res.send(resRoute)
+      // res.status(200).send(resRoute)}
 
 })
 
