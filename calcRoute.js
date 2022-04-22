@@ -55,10 +55,11 @@ function validateInitialRoute(result){
     }
     if( duration < 10 ){
         getCircle();
-        return false;
+		return 'circle'
     }
-    else return true;
+    else return 'rectangle';
 }
+
 
 module.exports = {
 //2 initiates shortest path to start from
@@ -86,7 +87,9 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes) {
 	.then(async function () {
 		if (!isvalid)
 			throw 'Initial route err'
-		return await get().then(res=>res)
+		else if (isValid = 'circle')
+			await getCircle().then(res=>res);
+		else await get().then(res=>res)
 	})
 } }
 
@@ -187,35 +190,24 @@ function getRectangle(PolygonCoords) {
 
 //3.2 draw circle
 async function getCircle() {
-	// Circle = new google.maps.Circle({
-	// 	strokeWeight: 2,
-	// 	fillOpacity: 0.1,
-	// 	map,
-	// 	center: near_end,
-	// 	radius: 2000,
-	// });
-	// map.fitBounds(Circle.getBounds())
-	// service = new google.maps.places.PlacesService(map);
-
-	for (let i = 0; i < requestedTypes.types.length; i++) {
-		await service.nearbySearch({
-			bounds: Circle.getBounds(),
-			radius: '2000',
-			type: [requestedTypes.types[i]],
-
-		}, callback);
-	}
-
-	function callback(results, status) {
-		if (status == google.maps.places.PlacesServiceStatus.OK) {
-			for (var i = 0; i < results.length; i++) {
-				if (Circle.getBounds().contains(results[i].geometry.location) == true) {
-					optionalStops[optionalStops.length] = results[i]
+	return new Promise(async function (resolve,reject){
+		for (let i = 0; i < tempRequestedTypes.types.length; i++) {
+		await client.placesNearby({
+			params:{
+				location: endPoint,
+				radius: '3000',
+				type: tempRequestedTypes.types[i],
+				key: 'AIzaSyAXYE1mVk8vzezCV5s3BfDPM-qJZDcIgw8'
 				}
-				else (alert("false"))
-			}
-		}
+		})
+		.then(res=> {
+			optionalStops.push(...res.data.results)
+		})
 	}
+	console.log('circle mode')
+	let x = await initialStops();
+	resolve(x)
+	})
 }
 
 async function initialStops() {
