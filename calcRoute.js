@@ -81,13 +81,11 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes) {
 		if(res.status=="OK"){
 			isvalid = validateInitialRoute(res)
 			waypoints = PolyUtil.decode(res.routes[0].overview_polyline.points)
-			if (!isvalid)
-				return new Error('Invalid route request');
 		}	
 	})
 	.then(async function () {
 		if (!isvalid)
-			return;
+			throw 'Initial route err'
 		return await get().then(res=>res)
 	})
 } }
@@ -327,10 +325,9 @@ async function findOptimalRoute() {
 	for (let i = 0; i < distanceFromStart.rows[0].elements.length; i++)
 		algorithm(distanceMatrix[i].routes,distanceMatrix[i].routes, StartToPoint(i), [startPoint], i)
 
-	if(bestRoute == ""){
-		console.log("There are no valid route for this request. Try again!")
-		return;
-	}
+	if(bestRoute == "")
+		throw 'Best route err'
+
 	let finalStops = bestRoute.route.slice(1, bestRoute.route.length - 1);
 	return await client.directions({
 		params: {

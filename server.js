@@ -109,10 +109,28 @@ app.post("/route",jsonParser,(req,res)=>{
   let destination=req.body.destination
   let requestedTypes=req.body.requestedTypes
   calcRoute.initialRoute(origin,destination,requestedTypes)
-    .then(resRoute=>res.status(200).send(resRoute))
+    .then(resRoute=>{
+      res.status(200).send(resRoute)}
+      )
+    .catch(err => {
+      let statusCode = handleErrors(err)
+      res.status(statusCode).send(err)
+    })
 
 })
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
+
+
+const handleErrors = (e) => {
+  switch(e){
+    case 'Initial route err':
+      return 400
+    case 'Best route err':
+      return 404
+    default: 
+      return 0
+  }
+}
