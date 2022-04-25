@@ -16,7 +16,7 @@ var distanceToEnd = "";
 var distanceFromStart = "";
 var bounds;
 var tempRequestedTypes
-
+var db = {}
 const apiKey = 'AIzaSyAXYE1mVk8vzezCV5s3BfDPM-qJZDcIgw8'
 const {Client} = require("@googlemaps/google-maps-services-js");
 const { PolyUtil} = require("node-geometry-library");
@@ -63,12 +63,16 @@ function validateInitialRoute(result){
 
 module.exports = {
 //2 initiates shortest path to start from
-initialRoute: async function initialRoute(origin,destination,requestedTypes) {
+initialRoute: async function initialRoute(origin,destination,requestedTypes,dbStops) {
 	resetAll();
-	let isvalid;
+	let isValid;
 	tempRequestedTypes={'types':requestedTypes.map(x=>x.type),'values':requestedTypes.map(x=>x.value)};
 	startPoint = origin;
 	endPoint = destination;
+	let tempDB = Object.keys(dbStops)
+	for (let i=0;i<tempDB.length;i++)
+		db[tempDB[i]] = Object.values(dbStops[tempDB[i]])
+		//console.log(Object.keys(dbStops).map(key => {return {[key]: Object.values(dbStops[key])}}))
 	//initial Route check
 	return await client.directions({
 		params:{
@@ -80,16 +84,16 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes) {
 	}).then((result)=> {
 		let res = result.data
 		if(res.status=="OK"){
-			isvalid = validateInitialRoute(res)
+			isValid = validateInitialRoute(res)
 			waypoints = PolyUtil.decode(res.routes[0].overview_polyline.points)
 		}	
 	})
 	.then(async function () {
-		if (!isvalid)
+		if (!isValid)
 			throw 'Initial route err'
-		else if (isValid = 'circle')
-			await getCircle().then(res=>res);
-		else await get().then(res=>res)
+		else if (isValid == 'circle')
+			 return await getCircle().then(res=>res);
+		else return await get().then(res=>res)
 	})
 } }
 
@@ -99,30 +103,17 @@ function get() {
 	 return new Promise(async function(resolve,reject){
 		const PolygonCoords = PolygonPoints();
 		getRectangle(PolygonCoords)
-	
-	for (let j = 0; j < PolygonCoords.length; j += 40) {
-		for (let i = 0; i < tempRequestedTypes.types.length; i++) {
-			await client.placesNearby({
-				params:{
-				location: PolygonCoords[j],
-				radius: '1000',
-				type: tempRequestedTypes.types[i],
-				key: 'AIzaSyAXYE1mVk8vzezCV5s3BfDPM-qJZDcIgw8'
-				}
-			}).then(res=> {
-			if(res.data.status=="OK")
-			{
-				let results = res.data.results;
-				for (let i = 0; i < results.length; i++) {
-					if (PolyUtil.containsLocation(results[i].geometry.location,PolygonCoords,true))
-						optionalStops[optionalStops.length] = results[i]
+		for(let i=0;i<tempRequestedTypes.types.length;i++){
+			let tempRequestedType = db[tempRequestedTypes.types[i]]
+			for(let j=0;j<tempRequestedType.length;j++){
+				let tempLocation = {'lat':tempRequestedType[j].latitude,'lng':tempRequestedType[j].longitude}
+				if (PolyUtil.containsLocation(tempLocation,PolygonCoords,true)){
+					optionalStops[optionalStops.length] = {'type':tempRequestedTypes.types[i],'location':tempLocation}
 				}
 			}
-		
-		})
-	}}
-			let x = await initialStops();
-			resolve(x)
+		}
+		let x = await initialStops();
+		resolve(x)
 	})
 }
 
@@ -189,8 +180,9 @@ function getRectangle(PolygonCoords) {
 }
 
 //3.2 draw circle
-async function getCircle() {
+function getCircle() {
 	return new Promise(async function (resolve,reject){
+
 		for (let i = 0; i < tempRequestedTypes.types.length; i++) {
 		await client.placesNearby({
 			params:{
@@ -204,35 +196,36 @@ async function getCircle() {
 			optionalStops.push(...res.data.results)
 		})
 	}
+
 	console.log('circle mode')
+	// console.log(optionalStops)
 	let x = await initialStops();
 	resolve(x)
 	})
 }
 
 async function initialStops() {
+
 	if(optionalStops.length == 0){
 		console.log("there is no valid stops in this request");
-		//window.location.reload();
 	}
+
 	//optionalMarkers = []
 	for (let i = 0; i < optionalStops.length; i++) {
-		let specifiedTypes = optionalStops[i].types.filter(element => tempRequestedTypes.types.includes(element))[0]
 		optionalStops = optionalStops.filter(function (point) {
-			if (point.place_id === optionalStops[i].place_id) return true
-			if (point.types.filter(element => specifiedTypes.includes(element)).length == 0)
+			if (point.location === optionalStops[i].location || point.type != optionalStops[i].type) return true
+			if (point.location.lat > optionalStops[i].location.lat + 0.005 ||
+				point.location.lat < optionalStops[i].location.lat - 0.005)
 				return true;
-			if (point.geometry.location.lat > optionalStops[i].geometry.location.lat + 0.005 ||
-				point.geometry.location.lat < optionalStops[i].geometry.location.lat - 0.005)
-				return true;
-			if (point.geometry.location.lng > optionalStops[i].geometry.location.lng + 0.005 ||
-				point.geometry.location.lng < optionalStops[i].geometry.location.lng - 0.005)
+			if (point.location.lng > optionalStops[i].location.lng + 0.005 ||
+				point.location.lng < optionalStops[i].location.lng - 0.005)
 				return true;
 			return false;
 		})
 	}
+	console.log(optionalStops)
 
-	return await findOptimalRoute().then(res=>res)
+	return await findOptimalRoute().then(res=>res).catch(err=>err)
 }
 
 //4 calculate optimal route
@@ -245,56 +238,60 @@ async function findOptimalRoute() {
 		}
 		arr = optionalStops.map((x, idx) => (
 			{
-				'name': x.name,
-				'location': x.geometry.location.lat + "," + x.geometry.location.lng,
+				'location': x.location.lat + "," + x.location.lng,
 				'id': idx,
-				'type': x.types.filter(type => tempRequestedTypes.types.includes(type))[0]
+				'type': x.type
 			}))
 
 		tempArr = []
 		let tempRequests = {...tempRequestedTypes};
-		while (tempArr.length < 8 && arr.length>0) {
-			for (let i = 0; i < tempRequests.types.length; i++) {
-				if (tempArr.length < 8) {
-					tempStop = arr.find(x => x.type == tempRequests.types[i])
-					if(tempStop==undefined && tempArr.length < tempRequests.types.length){
-						if(confirm("There is no " + tempRequests.types[i] + " Stop. Do you want to advance without it?")){
-							tempRequests.types=tempRequests.types.filter(x=>x!==tempRequests.types[i]);
-							tempRequests.values=tempRequests.values.filter(x=>x!==tempRequests.values[i]);
-						}else{
-							alert("please try different request");
-							//window.location.reload();
-							return;
-						}
 
-					}else{
+		//We need to fix it to up to 8 stops when we have enough stops! (tempArr.length < 8) in the while condition
+		while (arr.length>0) {
+			for (let i = 0; i < tempRequests.types.length; i++) {
+				if(arr.length>0){
+					tempStop = arr.find(x => x.type == tempRequests.types[i])
+					if(tempStop==undefined && tempArr.length < tempRequests.types.length)
+						throw "not valid stop"
+						//We need to check how to send to the client that there is some stop is not valid in the map
+						
+						// if(confirm("There is no " + tempRequests.types[i] + " Stop. Do you want to advance without it?")){
+						// 	tempRequests.types=tempRequests.types.filter(x=>x!==tempRequests.types[i]);
+						// 	tempRequests.values=tempRequests.values.filter(x=>x!==tempRequests.values[i]);
+						// }else{
+						// 	alert("please try different request");
+						// 	//window.location.reload();
+						// 	return;
+						// }
+				
+					else if(tempStop!=undefined){
 					tempArr.push(tempStop);
 					arr = arr.filter(x => x != tempStop)
 					}
 				}
 			}
 		}
-
+		console.log(tempArr)
 		tempArr = tempArr.map(x => x.id)
 		optionalStops = optionalStops.filter((x, idx) => tempArr.includes(idx));
+		optionalLatLng = optionalStops.map(e => {return {latitude:e.location.lat,longitude:e.location.lng}})
+		distanceFromStart = await client.distancematrix({
+			params: { 
+				destinations: optionalLatLng,
+				mode: 'driving', 
+				origins: [startPoint],
+				key:apiKey
+			}
+		}).then(res=>res.data)
+		distanceToEnd = await client.distancematrix({
+			params: { 
+				destinations:[endPoint],
+				mode: 'driving',
+				origins: optionalLatLng,
+				key:apiKey
+			}
+		}).then(res=>res.data)
 
-	optionalLatLng = optionalStops.map(e => {return {latitude:e.geometry.location.lat,longitude:e.geometry.location.lng}})
-	distanceFromStart = await client.distancematrix({
-		params: { 
-			destinations: optionalLatLng,
-			mode: 'driving', 
-			origins: [startPoint],
-			key:apiKey
-		}
-	}).then(res=>res.data)
-	distanceToEnd = await client.distancematrix({
-		params: { 
-			destinations:[endPoint],
-			mode: 'driving',
-			origins: optionalLatLng,
-			key:apiKey
-		}
-	}).then(res=>res.data)
 	temp = await client.distancematrix({
 		params: { 
 			destinations:optionalLatLng,
@@ -303,20 +300,23 @@ async function findOptimalRoute() {
 			key:apiKey
 		}
 	}).then(res=>res.data)
-	console.log(tempRequests)
+	// for (let i = 0; i < temp.rows.length; i++)
+	// 	console.log(temp.rows[i].elements)
+
 	for (let i = 0; i < temp.rows.length; i++) {
 		distanceMatrix.push({
 			'from': optionalStops[i],
 			'routes': temp.rows[i].elements.map((point, idx) => {
-				let type = optionalStops[idx].types.filter(x => tempRequests.types.includes(x))[0];
+				let type = optionalStops[idx].type;
 				return { 'stop': optionalStops[idx], 'duration': point.duration, 'real_index': idx, 'type': type, 'stopValue': tempRequests.values[tempRequests.types.indexOf(type)] }
 			})
 		})
 	}
+	console.log(distanceMatrix[0].routes)
 
 	for (let i = 0; i < distanceFromStart.rows[0].elements.length; i++)
 		algorithm(distanceMatrix[i].routes,distanceMatrix[i].routes, StartToPoint(i), [startPoint], i)
-
+	
 	if(bestRoute == "")
 		throw 'Best route err'
 
@@ -325,7 +325,7 @@ async function findOptimalRoute() {
 		params: {
 			origin: bestRoute.route[0],
 			destination: bestRoute.route[bestRoute.route.length - 1],
-			waypoints: finalStops.map(x => x.stop.geometry.location),
+			waypoints: finalStops.map(x => x.stop.location),
 			travelMode: 'driving',
 			key: apiKey
 		}
@@ -340,8 +340,8 @@ function algorithm(possibleStops,unMandatoryStops,sum, currentRoute, startIndex)
 	for (let i = 0; i < possibleStops.length; i++) {
 		if (sum + distanceBetweenPoint(startIndex, possibleStops[i].real_index) < 40 * 60) {
 			let otherStops;
-			unMandatoryStops = unMandatoryStops.filter(route => route.stop.place_id !== possibleStops[i].stop.place_id)
-			if(currentRoute.length>=requestedTypes.types.length)
+			unMandatoryStops = unMandatoryStops.filter(route => route.stop.location !== possibleStops[i].stop.location)
+			if(currentRoute.length>=tempRequestedTypes.types.length)
 				otherStops=unMandatoryStops;
 			else
 				otherStops = possibleStops.filter(route => route.type !== possibleStops[i].type);

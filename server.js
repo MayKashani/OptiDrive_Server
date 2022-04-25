@@ -5,8 +5,9 @@ const bodyParser = require ("body-parser")
 const admin = require("firebase-admin")
 const serviceAccount = require("./privateService.json");
 const axios = require ("axios");
+
 const jsonParser = bodyParser.json({ limit: '10mb', extended: true });
-const PORT =  process.env.PORT || 5000;
+const PORT =  5000;
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -40,6 +41,8 @@ app.post("/students",jsonParser,(req,res)=>{
   res.send(req.body.name)
 });
 
+
+
 //GET students according to userID in FIREBASE
 app.get("/students",(req,res)=>{
   ref.child("users").child(req.query.uId).child("students").once("value",snapshot=>{
@@ -52,31 +55,12 @@ app.get("/students",(req,res)=>{
   })
 })
 
-
-app.post("/stops",jsonParser,(req,res)=>{
-  console.log(req.query)
-  ref.child("stops").child(req.query.type).push(req.body)
-  res.send(req.body)
-});
-
-
-app.get("/getStops",(req,res)=>{
-  ref.child("stops").child("parking").once("value",snapshot=>{
-      if(snapshot.val() != null)
-        res.status(200).send(snapshot.val())
-      else
-        res.status(404).send("no stops")
-  })
-})
-
-
 app.post('/routes',jsonParser,(req,res)=>{
   console.log(req.body)
 })
 
 //GET ALL Lessons from firebase according to userID
 app.get("/lessons",(req,res)=>{
-  console.log(req)
   ref.child("users").child(req.query.uId).child("lessons").once("value",snapshot=>{
       if(snapshot.val() != null)
         res.status(200).send(snapshot.val())
@@ -108,20 +92,45 @@ app.post("/route",jsonParser,(req,res)=>{
   let origin=req.body.origin
   let destination=req.body.destination
   let requestedTypes=req.body.requestedTypes
-  calcRoute.initialRoute(origin,destination,requestedTypes)
-    .then(resRoute=>{
-      res.status(200).send(resRoute)}
-      )
-    .catch(err => {
-      let statusCode = handleErrors(err)
-      res.status(statusCode).send(err)
-    })
+
+  ref.child("stops").once("value",snapshot=>{
+    if(snapshot.val() != null)
+      calcRoute.initialRoute(origin,destination,requestedTypes,snapshot.val())
+      .then(resRoute=>{
+        console.log(resRoute)
+        res.status(200).send(resRoute)}
+        )
+      .catch(err => {
+        let statusCode = handleErrors(err)
+        res.status(statusCode).send(err)
+      })
+})
+
+
 
 })
+
+app.post("/stops",jsonParser,(req,res)=>{
+  console.log(req.query)
+  ref.child("stops").child(req.query.type).push(req.body)
+  res.send(req.body)
+});
+
+
+app.get("/getStops",(req,res)=>{
+  ref.child("stops").once("value",snapshot=>{
+      if(snapshot.val() != null)
+        res.status(200).send(snapshot.val())
+      else
+        res.status(404).send("no stops")
+  })
+})
+
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
+
 
 
 const handleErrors = (e) => {
@@ -131,6 +140,6 @@ const handleErrors = (e) => {
     case 'Best route err':
       return 404
     default: 
-      return 0
+      return 'error';
   }
 }
