@@ -7,7 +7,7 @@ const serviceAccount = require("./privateService.json");
 const axios = require ("axios");
 
 const jsonParser = bodyParser.json({ limit: '10mb', extended: true });
-const PORT =  5000;
+const PORT =  5000 || process.env;
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
