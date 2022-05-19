@@ -17,7 +17,8 @@ var distanceFromStart = "";
 var bounds;
 var tempRequestedTypes
 var db = {}
-const apiKey = 'AIzaSyAXYE1mVk8vzezCV5s3BfDPM-qJZDcIgw8'
+//const apiKey = 'AIzaSyAXYE1mVk8vzezCV5s3BfDPM-qJZDcIgw8'
+const apiKey = 'AIzaSyBOtTnNMpmBSfZHEWBDmmhyMX9WW-EzMXE'
 const {Client} = require("@googlemaps/google-maps-services-js");
 const { PolyUtil} = require("node-geometry-library");
 
