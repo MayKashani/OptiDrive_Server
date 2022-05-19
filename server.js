@@ -6,10 +6,8 @@ const admin = require("firebase-admin")
 const serviceAccount = require("./privateService.json");
 const axios = require ("axios");
 
-const native =5000;
-const react= 3000;
 const jsonParser = bodyParser.json({ limit: '10mb', extended: true });
-const PORT = process.env.PORT || react
+const PORT = process.env.PORT || 5000
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -132,7 +130,6 @@ app.get("/getStops",(req,res)=>{
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
-
 
 
 
