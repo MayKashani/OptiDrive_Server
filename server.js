@@ -4,7 +4,7 @@ const cors = require("cors")
 const bodyParser = require ("body-parser")
 const admin = require("firebase-admin")
 const serviceAccount = require("./privateService.json");
-const axios = require ("axios");
+
 
 const jsonParser = bodyParser.json({ limit: '10mb', extended: true });
 const PORT = process.env.PORT || 5000

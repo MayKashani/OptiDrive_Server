@@ -17,7 +17,7 @@ var distanceFromStart = "";
 var bounds;
 var tempRequestedTypes
 var db = {}
-const apiKey = 'AIzaSyAXYE1mVk8vzezCV5s3BfDPM-qJZDcIgw8'
+const apiKey = 'AIzaSyBOtTnNMpmBSfZHEWBDmmhyMX9WW-EzMXE'
 const {Client} = require("@googlemaps/google-maps-services-js");
 const { PolyUtil} = require("node-geometry-library");
 
@@ -74,6 +74,7 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes,dbSt
 		db[tempDB[i]] = Object.values(dbStops[tempDB[i]])
 		//console.log(Object.keys(dbStops).map(key => {return {[key]: Object.values(dbStops[key])}}))
 	//initial Route check
+	console.log(db)
 	return await client.directions({
 		params:{
 			origin: startPoint,
@@ -103,6 +104,7 @@ function get() {
 	 return new Promise(async function(resolve,reject){
 		const PolygonCoords = PolygonPoints();
 		getRectangle(PolygonCoords)
+
 		for(let i=0;i<tempRequestedTypes.types.length;i++){
 			let tempRequestedType = db[tempRequestedTypes.types[i]]
 			for(let j=0;j<tempRequestedType.length;j++){
@@ -189,7 +191,7 @@ function getCircle() {
 				location: endPoint,
 				radius: '3000',
 				type: tempRequestedTypes.types[i],
-				key: 'AIzaSyAXYE1mVk8vzezCV5s3BfDPM-qJZDcIgw8'
+				key: apiKey
 				}
 		})
 		.then(res=> {
@@ -223,13 +225,13 @@ async function initialStops() {
 			return false;
 		})
 	}
-	console.log(optionalStops)
 
 	return await findOptimalRoute().then(res=>res).catch(err=>err)
 }
 
 //4 calculate optimal route
 async function findOptimalRoute() {
+	console.log(optionalStops)
 		if (optionalStops.length >= 8) {
 			optionalStops = optionalStops
 				.map((value) => ({ value, sort: Math.random() }))
@@ -271,7 +273,7 @@ async function findOptimalRoute() {
 				}
 			}
 		}
-		console.log(tempArr)
+
 		tempArr = tempArr.map(x => x.id)
 		optionalStops = optionalStops.filter((x, idx) => tempArr.includes(idx));
 		optionalLatLng = optionalStops.map(e => {return {latitude:e.location.lat,longitude:e.location.lng}})
@@ -312,7 +314,7 @@ async function findOptimalRoute() {
 			})
 		})
 	}
-	console.log(distanceMatrix[0].routes)
+
 
 	for (let i = 0; i < distanceFromStart.rows[0].elements.length; i++)
 		algorithm(distanceMatrix[i].routes,distanceMatrix[i].routes, StartToPoint(i), [startPoint], i)
