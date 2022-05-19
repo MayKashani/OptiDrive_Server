@@ -7,7 +7,7 @@ const serviceAccount = require("./privateService.json");
 const axios = require ("axios");
 
 const jsonParser = bodyParser.json({ limit: '10mb', extended: true });
-const PORT = process.env.PORT || 5000 || 3000
+const PORT = process.env.PORT || 5000 
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -20,7 +20,15 @@ const ref = firebaseDB.ref()
 
 
 app.use(cors())
-app.use()
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", '*');
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
+  next();
+});
+
+
 app.post("/users",jsonParser,(req,res)=>{
   console.log(req.body)
   admin.auth().createUser({
