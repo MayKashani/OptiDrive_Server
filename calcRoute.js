@@ -87,11 +87,19 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes,dbSt
 		}	
 	})
 	.then(async function () {
+		let response = null;
 		if (!isValid)
-			throw 'Initial route err'
+			throw 'Route is too long! Choose another one.'
 		else if (isValid == 'circle')
-			 return await getCircle().then(res=>res);
-		else return await get().then(res=>res)
+			 response = await getCircle().then(res=>res);
+		else response =  await get().then(res=>res)
+		console.log(response)
+			if(response=="not valid stop" || response=="there is no valid stops in this request"){
+				throw "not valid stops"
+			}		
+			if(response == 'Best route was not found')
+				throw response
+			return response;
 	})
 } }
 
@@ -208,10 +216,9 @@ function getCircle() {
 }
 
 async function initialStops() {
-
+	console.log(`optional stops length is ${optionalStops.length}`)
 	if(optionalStops.length == 0){
-		console.log("there is no valid stops in this request");
-
+		return "there is no valid stops in this request";
 	}
 
 	//optionalMarkers = []
@@ -253,7 +260,7 @@ async function findOptimalRoute() {
 		//We need to fix it to up to 8 stops when we have enough stops! (tempArr.length < 8) in the while condition
 		while (arr.length>0 && tempArr.length < 8) {
 			for (let i = 0; i < tempRequests.types.length; i++) {
-				if(arr.length>0){
+				if(arr.length>0 && tempArr.length < 8){
 					tempStop = arr.find(x => x.type == tempRequests.types[i])
 					if(tempStop==undefined && tempArr.length < tempRequests.types.length)
 						throw "not valid stop"
@@ -275,7 +282,7 @@ async function findOptimalRoute() {
 				}
 			}
 		}
-
+		console.log(tempArr)
 		tempArr = tempArr.map(x => x.id)
 		optionalStops = optionalStops.filter((x, idx) => tempArr.includes(idx));
 		optionalLatLng = optionalStops.map(e => {return {latitude:e.location.lat,longitude:e.location.lng}})
@@ -320,9 +327,11 @@ async function findOptimalRoute() {
 
 	for (let i = 0; i < distanceFromStart.rows[0].elements.length; i++)
 		algorithm(distanceMatrix[i].routes,distanceMatrix[i].routes, StartToPoint(i), [startPoint], i)
-	
-	if(bestRoute == "")
-		throw 'Best route err'
+	console.log(bestRoute)
+	if(bestRoute == ""){
+		throw 'Best route was not found'
+	}
+		
 
 	let finalStops = bestRoute.route.slice(1, bestRoute.route.length - 1);
 	return await client.directions({
@@ -352,7 +361,7 @@ function algorithm(possibleStops,unMandatoryStops,sum, currentRoute, startIndex)
 			algorithm(otherStops,unMandatoryStops,sum + distanceBetweenPoint(startIndex, possibleStops[i].real_index), currentRoute.concat(possibleStops[i]), possibleStops[i].real_index);
 		}
 	}
-	if (sum + PointToEnd(startIndex) <= 40 * 60 && (bestRoute == "" || sum + PointToEnd(startIndex) > bestRoute.sum && possibleStops.length == 0))
+	if (sum + PointToEnd(startIndex) <= 40 * 60 && (bestRoute == "" && currentRoute.length>tempRequestedTypes.types.length || sum + PointToEnd(startIndex) > bestRoute.sum && possibleStops.length == 0))
 		bestRoute = { 'route': currentRoute.concat(endPoint), 'sum': sum + PointToEnd(startIndex) };
 
 }

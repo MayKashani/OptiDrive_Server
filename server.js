@@ -97,7 +97,6 @@ app.post("/route",jsonParser,(req,res)=>{
     if(snapshot.val() != null)
       calcRoute.initialRoute(origin,destination,requestedTypes,snapshot.val())
       .then(resRoute=>{
-        console.log(resRoute)
         res.status(200).send(resRoute)}
         )
       .catch(err => {
@@ -135,11 +134,11 @@ app.listen(PORT, () => {
 
 const handleErrors = (e) => {
   switch(e){
-    case 'Initial route err':
-      return 400
-    case 'Best route err':
+    case 'Route is too long! Choose another one.'||"not valid stops":
       return 404
+    case 'Best route was not found':
+      return 400
     default: 
-      return 'error';
+      return 500;
   }
 }
