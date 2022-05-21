@@ -72,9 +72,6 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes,dbSt
 	let tempDB = Object.keys(dbStops)
 	for (let i=0;i<tempDB.length;i++)
 		db[tempDB[i]] = Object.values(dbStops[tempDB[i]])
-		//console.log(Object.keys(dbStops).map(key => {return {[key]: Object.values(dbStops[key])}}))
-	//initial Route check
-	console.log(db)
 	return await client.directions({
 		params:{
 			origin: startPoint,
@@ -184,23 +181,27 @@ function getRectangle(PolygonCoords) {
 //3.2 draw circle
 function getCircle() {
 	return new Promise(async function (resolve,reject){
-
 		for (let i = 0; i < tempRequestedTypes.types.length; i++) {
-		await client.placesNearby({
-			params:{
-				location: endPoint,
-				radius: '3000',
-				type: tempRequestedTypes.types[i],
-				key: apiKey
+			let tempRequestedPoints = db[tempRequestedTypes.types[i]]
+			for(let j=0;j<tempRequestedPoints.length;j++){
+				let tempLocation = {'lat':tempRequestedPoints[j].latitude,'lng':tempRequestedPoints[j].longitude}
+				if(Math.abs(tempLocation.lat-endPoint.latitude)<0.025 && Math.abs(tempLocation.lng-endPoint.longitude)<0.025)
+					optionalStops[optionalStops.length] = {'type':tempRequestedTypes.types[i],'location':tempLocation}		
 				}
-		})
-		.then(res=> {
-			optionalStops.push(...res.data.results)
-		})
+		// await client.placesNearby({
+		// 	params:{
+		// 		location: endPoint,
+		// 		radius: '3000',
+		// 		type: tempRequestedTypes.types[i],
+		// 		key: 'AIzaSyAXYE1mVk8vzezCV5s3BfDPM-qJZDcIgw8'
+		// 		}
+		// })
+		// .then(res=> {
+		// 	optionalStops.push(...res.data.results)
+		// })
+			
 	}
-
 	console.log('circle mode')
-	// console.log(optionalStops)
 	let x = await initialStops();
 	resolve(x)
 	})
@@ -210,6 +211,7 @@ async function initialStops() {
 
 	if(optionalStops.length == 0){
 		console.log("there is no valid stops in this request");
+
 	}
 
 	//optionalMarkers = []
@@ -231,7 +233,7 @@ async function initialStops() {
 
 //4 calculate optimal route
 async function findOptimalRoute() {
-	console.log(optionalStops)
+
 		if (optionalStops.length >= 8) {
 			optionalStops = optionalStops
 				.map((value) => ({ value, sort: Math.random() }))
@@ -249,7 +251,7 @@ async function findOptimalRoute() {
 		let tempRequests = {...tempRequestedTypes};
 
 		//We need to fix it to up to 8 stops when we have enough stops! (tempArr.length < 8) in the while condition
-		while (arr.length>0) {
+		while (arr.length>0 && tempArr.length < 8) {
 			for (let i = 0; i < tempRequests.types.length; i++) {
 				if(arr.length>0){
 					tempStop = arr.find(x => x.type == tempRequests.types[i])
