@@ -36,7 +36,6 @@ app.post("/users",jsonParser,(req,res)=>{
 
 //POST student according to userID in FIREBASE
 app.post("/students",jsonParser,(req,res)=>{
-  console.log(req.query.uId)
   ref.child("users").child(req.query.uId).child("students").child(req.body.id).set(req.body)
   res.send(req.body.name)
 });
@@ -48,7 +47,6 @@ app.get("/students",(req,res)=>{
   ref.child("users").child(req.query.uId).child("students").once("value",snapshot=>{
       if(snapshot.val() != null){
         res.status(200).send(snapshot.val())
-        console.log(snapshot.val())
       }
       else
         res.status(404).send("no students for you")
@@ -92,17 +90,20 @@ app.post("/route",jsonParser,(req,res)=>{
   let origin=req.body.origin
   let destination=req.body.destination
   let requestedTypes=req.body.requestedTypes
-
+  let departureTime = req.body.departureTime
+  console.log(departureTime)
   ref.child("stops").once("value",snapshot=>{
-    if(snapshot.val() != null)
-      calcRoute.initialRoute(origin,destination,requestedTypes,snapshot.val())
-      .then(resRoute=>{
-        res.status(200).send(resRoute)}
+    if (snapshot.val() != null) {
+      calcRoute.initialRoute(origin, destination, requestedTypes, snapshot.val(), departureTime)
+        .then(resRoute => {
+          res.status(200).send(resRoute)
+        }
         )
-      .catch(err => {
-        let statusCode = handleErrors(err)
-        res.status(statusCode).send(err)
-      })
+        .catch(err => {
+          let statusCode = handleErrors(err)
+          res.status(statusCode).send(err)
+        })
+    }
 })
 
 

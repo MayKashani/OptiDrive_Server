@@ -15,9 +15,10 @@ var distanceMatrix = [];
 var distanceToEnd = "";
 var distanceFromStart = "";
 var bounds;
+var departureTime;
 var tempRequestedTypes
 var db = {}
-const apiKey = 'AIzaSyBOtTnNMpmBSfZHEWBDmmhyMX9WW-EzMXE'
+const apiKey = 'AIzaSyDthlmSDFzdKH8eYH4Ni6JC3Zw1fVKkREs'
 const {Client} = require("@googlemaps/google-maps-services-js");
 const { PolyUtil} = require("node-geometry-library");
 
@@ -63,12 +64,13 @@ function validateInitialRoute(result){
 
 module.exports = {
 //2 initiates shortest path to start from
-initialRoute: async function initialRoute(origin,destination,requestedTypes,dbStops) {
+initialRoute: async function initialRoute(origin,destination,requestedTypes,dbStops,departure) {
 	resetAll();
 	let isValid;
 	tempRequestedTypes={'types':requestedTypes.map(x=>x.type),'values':requestedTypes.map(x=>x.value)};
 	startPoint = origin;
 	endPoint = destination;
+	departureTime = departure
 	let tempDB = Object.keys(dbStops)
 	for (let i=0;i<tempDB.length;i++)
 		db[tempDB[i]] = Object.values(dbStops[tempDB[i]])
@@ -77,7 +79,10 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes,dbSt
 			origin: startPoint,
 			destination: endPoint,
 			travelMode: "DRIVING",
-			key: apiKey
+			key: apiKey,
+			drivingOptions: {
+				departureTime: departureTime
+			}
 		}
 	}).then((result)=> {
 		let res = result.data
@@ -92,8 +97,8 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes,dbSt
 			throw 'Route is too long! Choose another one.'
 		else if (isValid == 'circle')
 			 response = await getCircle().then(res=>res);
-		else response =  await get().then(res=>res)
-		console.log(response)
+		else response =  await get().then(res=>res).then(console.log(response))
+		
 			if(response=="not valid stop" || response=="there is no valid stops in this request"){
 				throw "not valid stops"
 			}		
@@ -216,7 +221,7 @@ function getCircle() {
 }
 
 async function initialStops() {
-	console.log(`optional stops length is ${optionalStops.length}`)
+	//console.log(`optional stops length is ${optionalStops.length}`)
 	if(optionalStops.length == 0){
 		return "there is no valid stops in this request";
 	}
@@ -282,7 +287,7 @@ async function findOptimalRoute() {
 				}
 			}
 		}
-		console.log(tempArr)
+
 		tempArr = tempArr.map(x => x.id)
 		optionalStops = optionalStops.filter((x, idx) => tempArr.includes(idx));
 		optionalLatLng = optionalStops.map(e => {return {latitude:e.location.lat,longitude:e.location.lng}})
@@ -291,7 +296,10 @@ async function findOptimalRoute() {
 				destinations: optionalLatLng,
 				mode: 'driving', 
 				origins: [startPoint],
-				key:apiKey
+				key:apiKey,
+				drivingOptions: {
+					departureTime: departureTime
+				}
 			}
 		}).then(res=>res.data)
 		distanceToEnd = await client.distancematrix({
@@ -299,7 +307,10 @@ async function findOptimalRoute() {
 				destinations:[endPoint],
 				mode: 'driving',
 				origins: optionalLatLng,
-				key:apiKey
+				key:apiKey,
+				drivingOptions: {
+					departureTime: departureTime
+				}
 			}
 		}).then(res=>res.data)
 
@@ -308,7 +319,10 @@ async function findOptimalRoute() {
 			destinations:optionalLatLng,
 			mode: 'driving', 
 			origins: optionalLatLng,
-			key:apiKey
+			key:apiKey,
+			drivingOptions: {
+				departureTime: departureTime
+			}
 		}
 	}).then(res=>res.data)
 	// for (let i = 0; i < temp.rows.length; i++)
@@ -327,7 +341,7 @@ async function findOptimalRoute() {
 
 	for (let i = 0; i < distanceFromStart.rows[0].elements.length; i++)
 		algorithm(distanceMatrix[i].routes,distanceMatrix[i].routes, StartToPoint(i), [startPoint], i)
-	console.log(bestRoute)
+
 	if(bestRoute == ""){
 		throw 'Best route was not found'
 	}
@@ -340,7 +354,10 @@ async function findOptimalRoute() {
 			destination: bestRoute.route[bestRoute.route.length - 1],
 			waypoints: finalStops.map(x => x.stop.location),
 			travelMode: 'driving',
-			key: apiKey
+			key: apiKey,
+			drivingOptions: {
+				departureTime: departureTime
+			}
 		}
 	}).then(res=> {
 		if (res.data.status=="OK")
