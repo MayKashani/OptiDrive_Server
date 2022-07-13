@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "engines":{
-      "node": "16.13.1"
+  "engines": {
+    "node": "16.13.1"
   },
   "repository": {
     "type": "git",
@@ -28,6 +28,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.2",
     "firebase-admin": "^10.0.2",
-    "node-geometry-library": "^1.2.6"
+    "node-geometry-library": "^1.2.6",
+    "nodemon": "^2.0.19"
   }
 }

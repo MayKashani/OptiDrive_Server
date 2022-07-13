@@ -53,6 +53,29 @@ app.get("/students",(req,res)=>{
   })
 })
 
+//Delete students according to userID in FIREBASE
+app.delete("/students",jsonParser,(req,res)=>{
+  let studentRef = ref.child("users").child(req.query.uId).child("students/"+req.query.studentId)
+  if(!studentRef)
+    res.status(404).send("Student was not found");
+  else
+    studentRef.remove()
+    .then(_=>{
+      res.status(200).send("Student Remove Successfully");
+    });
+})
+
+//Delete lesson according to userID in FIREBASE
+app.delete("/lessons",(req,res)=>{
+  let studentRef = ref.child("lessons").child(req.query.uId).child("lessons").child(req.body.date).child(req.body.hour)
+  if(!studentRef)
+    res.status(404).send("Lesson was not found");
+  studentRef.remove()
+    .then(_=>{
+      res.status(200).send("Lesson Removed Successfully");
+    });
+})
+
 app.post('/routes',jsonParser,(req,res)=>{
   console.log(req.body)
 })
