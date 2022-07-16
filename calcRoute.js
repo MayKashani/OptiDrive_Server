@@ -70,7 +70,7 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes,dbSt
 	tempRequestedTypes={'types':requestedTypes.map(x=>x.type),'values':requestedTypes.map(x=>x.value)};
 	startPoint = origin;
 	endPoint = destination;
-	departureTime = departure
+	// departureTime = departure
 	let tempDB = Object.keys(dbStops)
 	for (let i=0;i<tempDB.length;i++)
 		db[tempDB[i]] = Object.values(dbStops[tempDB[i]])
@@ -80,9 +80,9 @@ initialRoute: async function initialRoute(origin,destination,requestedTypes,dbSt
 			destination: endPoint,
 			travelMode: "DRIVING",
 			key: apiKey,
-			drivingOptions: {
-				departureTime: departureTime
-			}
+			// drivingOptions: {
+			// 	departureTime: departureTime
+			// }
 		}
 	}).then((result)=> {
 		let res = result.data
@@ -297,9 +297,9 @@ async function findOptimalRoute() {
 				mode: 'driving', 
 				origins: [startPoint],
 				key:apiKey,
-				drivingOptions: {
-					departureTime: departureTime
-				}
+				// drivingOptions: {
+				// 	departureTime: departureTime
+				// }
 			}
 		}).then(res=>res.data)
 		distanceToEnd = await client.distancematrix({
@@ -308,9 +308,9 @@ async function findOptimalRoute() {
 				mode: 'driving',
 				origins: optionalLatLng,
 				key:apiKey,
-				drivingOptions: {
-					departureTime: departureTime
-				}
+				// drivingOptions: {
+				// 	departureTime: departureTime
+				// }
 			}
 		}).then(res=>res.data)
 
@@ -320,9 +320,9 @@ async function findOptimalRoute() {
 			mode: 'driving', 
 			origins: optionalLatLng,
 			key:apiKey,
-			drivingOptions: {
-				departureTime: departureTime
-			}
+			// drivingOptions: {
+			// 	departureTime: departureTime
+			// }
 		}
 	}).then(res=>res.data)
 	// for (let i = 0; i < temp.rows.length; i++)
@@ -355,9 +355,9 @@ async function findOptimalRoute() {
 			waypoints: finalStops.map(x => x.stop.location),
 			travelMode: 'driving',
 			key: apiKey,
-			drivingOptions: {
-				departureTime: departureTime
-			}
+			// drivingOptions: {
+			// 	departureTime: departureTime
+			// }
 		}
 	}).then(res=> {
 		if (res.data.status=="OK")

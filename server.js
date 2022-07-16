@@ -65,6 +65,8 @@ app.delete("/students",jsonParser,(req,res)=>{
     });
 })
 
+
+
 //Delete lesson according to userID in FIREBASE
 app.delete("/lessons",(req,res)=>{
   let studentRef = ref.child("lessons").child(req.query.uId).child("lessons").child(req.body.date).child(req.body.hour)
@@ -76,12 +78,28 @@ app.delete("/lessons",(req,res)=>{
     });
 })
 
+
+//Update student rating and No. Lesson
+app.put("/students",jsonParser,(req,res)=>{
+  let studentRef = ref.child("users").child(req.query.uId).child("students").child(req.query.studentId)
+  studentRef.once("value",snapshot=>{
+    console.log(snapshot.val()["StopsGrades"])
+  })
+  // for(let i=0;i<req.body.length;i++){
+  //   studentDetails["StopsGrades"][req.body[i]]
+  // }
+
+  res.status(200).send("Student Updated Successfully");
+
+})
+
 app.post('/routes',jsonParser,(req,res)=>{
   console.log(req.body)
 })
 
 //GET ALL Lessons from firebase according to userID
 app.get("/lessons",(req,res)=>{
+  console.log("checking lesson")
   ref.child("users").child(req.query.uId).child("lessons").once("value",snapshot=>{
       if(snapshot.val() != null)
         res.status(200).send(snapshot.val())
@@ -110,11 +128,12 @@ app.get("/lessons/today",(req,res)=>{
 
 
 app.post("/route",jsonParser,(req,res)=>{
+  console.log(req)
   let origin=req.body.origin
   let destination=req.body.destination
   let requestedTypes=req.body.requestedTypes
   let departureTime = req.body.departureTime
-  console.log(departureTime)
+  // console.log(`the departure time is: ${departureTime}`)
   ref.child("stops").once("value",snapshot=>{
     if (snapshot.val() != null) {
       calcRoute.initialRoute(origin, destination, requestedTypes, snapshot.val(), departureTime)
